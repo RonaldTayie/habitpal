@@ -1,47 +1,37 @@
 package com.example.habitpal
 
+import MainScreen
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.annotation.RequiresApi
 import com.example.habitpal.ui.theme.HabitPalTheme
+import com.example.habitpal.viewmodel.HabitLogViewModel
+import com.example.habitpal.viewmodel.HabitStreakViewModel
+import com.example.habitpal.viewmodel.HabitViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var habitViewModel: HabitViewModel
+    private lateinit var habitLogViewModel: HabitLogViewModel
+    private lateinit var habitStreakViewModel: HabitStreakViewModel
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val app = application as HabitPalApp
+        habitViewModel = HabitViewModel(app.habitRepository)
+        habitLogViewModel = HabitLogViewModel(app.habitLogRepository)
+        habitStreakViewModel = HabitStreakViewModel(app.habitLogRepository)
+
         enableEdgeToEdge()
         setContent {
             HabitPalTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                MainScreen(habitVM=habitViewModel,habitLogVM=habitLogViewModel, streakVM = habitStreakViewModel)
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HabitPalTheme {
-        Greeting("Android")
     }
 }
