@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
 
         val app = application as HabitPalApp
         habitViewModel = HabitViewModel(app.habitRepository)
-        habitLogViewModel = HabitLogViewModel(app.habitLogRepository)
+        habitLogViewModel = HabitLogViewModel(app.habitLogRepository,habitRepository = app.habitRepository)
         habitStreakViewModel = HabitStreakViewModel(app.habitLogRepository)
 
         enableEdgeToEdge()

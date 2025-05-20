@@ -1,6 +1,7 @@
 package com.example.habitpal.viewmodel
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -10,17 +11,22 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.habitpal.domain.models.Habit
 import com.example.habitpal.domain.repositories.HabitLogRepository
+import com.example.habitpal.domain.repositories.HabitRepository
 import com.example.habitpal.domain.utils.HabitReminderReceiver
 import com.example.habitpal.state.HabitLogState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 class HabitLogViewModel(
-    private val habitLogRepository: HabitLogRepository
-): ViewModel() {
+    private val habitLogRepository: HabitLogRepository,
+    private val habitRepository: HabitRepository
+) : ViewModel() {
 
     private val _state = MutableStateFlow(HabitLogState())
     val state = _state
@@ -28,37 +34,14 @@ class HabitLogViewModel(
     private val _logSuccess = MutableStateFlow<Boolean?>(null)
     val logSuccess = _logSuccess
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun logToday(habitId: Long) {
-        viewModelScope.launch {
-            val success = habitLogRepository.logToday(habitId)
-            _logSuccess.value = success
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun loadHabitLogs(habitId:Long){
-        viewModelScope.launch {
-            val logs = habitLogRepository.getHabitLogs(habitId)
-            state.update { it.copy(
-                habitLog = logs
-            ) }
-            val last = logs.findLast { log -> log.date==LocalDate.now() }
-            if (last !=null){
-                _logSuccess.value = true
-            }
-        }
-    }
-
-    fun clearState(){
-        state.update { it.copy(
-            habitLog = emptyList()
-        ) }
-        _logSuccess.value = false
-    }
-
+    @SuppressLint("ScheduleExactAlarm")
     @RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
     fun scheduleReminder(context: Context, habitTitle: String, delayInMillis: Long) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(AlarmManager::class.java)
+            if (!alarmManager.canScheduleExactAlarms()) return
+        }
+
         val intent = Intent(context, HabitReminderReceiver::class.java).apply {
             putExtra("habit_title", habitTitle)
         }
@@ -78,5 +61,53 @@ class HabitLogViewModel(
         )
     }
 
+    @SuppressLint("ScheduleExactAlarm")
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun logToday(context: Context, habitId: Long) {
+        viewModelScope.launch {
+            val habit = habitRepository.getHabit(habitId)
+            if (habit == null) {
+                _logSuccess.value = false
+                return@launch
+            }
 
+            val success = habitLogRepository.logToday(habit.id)
+            _logSuccess.value = success
+
+            if (success) {
+                val tomorrow9AM = LocalDateTime.now()
+                    .plusDays(1)
+                    .withHour(9).withMinute(0).withSecond(0).withNano(0)
+
+                val delay = ChronoUnit.MILLIS.between(LocalDateTime.now(), tomorrow9AM).coerceAtLeast(0)
+
+                scheduleReminder(
+                    context = context,
+                    habitTitle = habit.title,
+                    delayInMillis = delay
+                )
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun loadHabitLogs(habitId: Long) {
+        viewModelScope.launch {
+            val logs = habitLogRepository.getHabitLogs(habitId)
+            state.update {
+                it.copy(habitLog = logs)
+            }
+            val last = logs.findLast { log -> log.date == LocalDate.now() }
+            if (last != null) {
+                _logSuccess.value = true
+            }
+        }
+    }
+
+    fun clearState() {
+        state.update {
+            it.copy(habitLog = emptyList())
+        }
+        _logSuccess.value = false
+    }
 }

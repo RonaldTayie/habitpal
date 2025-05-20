@@ -57,7 +57,7 @@ fun StreakView(
                 }
 
                 Button(
-                    onClick = { logVM.logToday(habitId) },
+                    onClick = { logVM.logToday(navController.context,habitId) },
                     enabled = success != true // Disable if already logged
                 ) {
                     Text(
