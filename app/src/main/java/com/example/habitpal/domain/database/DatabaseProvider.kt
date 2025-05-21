@@ -1,6 +1,5 @@
 package com.example.habitpal.domain.database
 import android.content.Context
-import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase.Callback
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -10,7 +9,6 @@ import com.example.habitpal.domain.models.HabitGroup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.logging.Logger
 
 object DatabaseProvider {
 
@@ -23,12 +21,12 @@ object DatabaseProvider {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "habit_db"
-            ).addCallback(SeedCallback(context)).build().also { INSTANCE = it }
+            ).addCallback(SeedCallback()).build().also { INSTANCE = it }
         }
     }
 
 
-    private class SeedCallback(private val context: Context) : Callback() {
+    private class SeedCallback() : Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
 
