@@ -79,9 +79,6 @@ class HabitLogViewModel(
                 var nextNotificationDate: LocalDateTime = now;
 
                 when(habit.frequency){
-                    Frequency.HOURLY -> {
-                        nextNotificationDate = now.withHour(1)
-                    }
                     Frequency.DAILY -> {
                         nextNotificationDate = now.plusDays(1)
                     }
@@ -100,6 +97,7 @@ class HabitLogViewModel(
                     habitTitle = habit.title,
                     delayInMillis = delay
                 )
+                loadHabitLogs(habitId)
             }
         }
     }
