@@ -1,36 +1,94 @@
-### What it is
+## HabitPal Overview
 
-HabitPal is an Android app that helps users build and track habits. It lets you create habits, group them, log your progress, and visualize streaks. The app is built using Kotlin, Jetpack Compose for the UI, and Room for local database storage.
+### What It Is
+
+**HabitPal** is a native Android application that helps users build and track habits. Users can create habits, group them, log progress, and visualize streaks. It is developed in **Kotlin**, utilizing **Jetpack Compose** for UI and **Room** for local data storage.
 
 ---
 
-### How it works (high-level)
+### High-Level Architecture
 
-1. **App Structure**
-    - The app has a single Android module (in `:app`).
-    - Uses Jetpack Compose for modern, declarative UI.
-    - The data is stored locally using Room (SQLite database).
+#### 1. App Structure
 
-2. **Main Components**
-    - **Models:** These define data like Habit, HabitGroup, and HabitLog.
-    - **Repositories:** These handle operations with the database (CRUD for habits, groups, logs).
-    - **ViewModels:** These manage UI state and business logic, and talk to repositories.
-    - **Screens/Composables:** These are the UI pieces (like the main screen, charts, dialogs).
+* Single Android module (`:app`)
+* Declarative UI built with **Jetpack Compose**
+* Local data storage via **Room (SQLite)**
 
-3. **Data Flow**
-    - When you open the app, the MainActivity sets up ViewModels and shows the MainScreen.
-    - UI screens observe the ViewModel state (using Kotlin flows).
-    - Adding, editing, or deleting habits/groups is done via ViewModels, which update the database through repositories.
-    - The UI automatically updates when the data changes.
+#### 2. Main Components
 
-4. **Features**
-    - **Create & Manage Habits:** Add, edit, archive, and delete habits. Habits can belong to groups.
-    - **Habit Groups:** Organize habits into groups for better tracking.
-    - **Logging:** Record your habit completions.
-    - **Streaks & Charts:** Visualize your progress with streak counts and line charts.
+* **Models**: Define core data entities such as `Habit`, `HabitGroup`, and `HabitLog`.
+* **Repositories**: Handle database interactions (CRUD operations).
+* **ViewModels**: Manage UI state and business logic; act as intermediaries between the UI and repositories.
+* **Screens/Composables**: Composable UI elements for various screens like main dashboard, charts, dialogs, etc.
 
-5. **Persistence**
-    - All user data (habits, logs, groups) is stored locally using Room database, so it works offline.
+#### 3. Data Flow
 
-6. **Tech Stack**
-    - Kotlin, Jetpack Compose, Room, Hilt (for dependency injection), AndroidX libraries.
+* `MainActivity` initializes ViewModels and loads the `MainScreen`.
+* UI observes ViewModel state using Kotlin **Flow**.
+* Habit/group operations are performed via ViewModels, which in turn update the database through Repositories.
+* UI automatically reflects any data changes.
+
+---
+
+### Key Features
+
+* **Create & Manage Habits**: Add, edit, archive, or delete habits. Habits can be grouped.
+* **Habit Groups**: Organize habits into logical groups.
+* **Logging**: Record habit completions easily.
+* **Streaks & Charts**: Visualize progress through streak counters and line charts.
+
+---
+
+### Persistence
+
+All user data is stored locally using **Room**, ensuring full offline functionality.
+
+---
+
+### Tech Stack
+
+* **Language**: Kotlin
+* **UI**: Jetpack Compose
+* **Database**: Room
+* **Dependency Injection**: Hilt
+* **Libraries**: AndroidX components
+
+---
+
+## Technical Decisions
+
+### Kotlin & Jetpack Compose
+
+**Pros:**
+
+* Native support and better integration
+* Jetpack Compose simplifies and modernizes UI development
+* Fewer external dependencies compared to cross-platform solutions
+* High performance
+
+**Trade-offs:**
+
+* Building simple features may take more time due to verbose syntax
+
+### Room Database
+
+**Pros:**
+
+* Simple and efficient for well-defined structures
+* Easy integration with ViewModels and Flows
+
+**Trade-offs:**
+
+* Opinionated setup
+* Complex or nested data structures require extra handling and care
+
+---
+
+## Potential Improvements
+
+* Begin with a thorough and intentional **UI/UX design** process.
+* Refactor the project into a **native-compliant directory structure**.
+* Use **Dagger Hilt** more extensively for dependency injection to simplify code and avoid "prop drilling" (commonly referenced in JS development).
+* Current state management is solid but would benefit from better file organization.
+
+---
