@@ -57,7 +57,12 @@ class HabitViewModel(
                     isAddingHabit = false,
                     isEditingHabit = false,
                     targetHabit = null,
-                    isDeletingHabit = false
+                    isDeletingHabit = false,
+                    title = "",
+                    description = "",
+                    group = 0,
+                    frequency = Frequency.DAILY,
+                    isArchived = false,
                 ) }
             }
             HabitEvent.SaveHabit -> {
