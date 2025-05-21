@@ -39,7 +39,8 @@ class HabitViewModel(
             }
             HabitEvent.HideDialog -> {
                 _state.update { it.copy(
-                    isAddingHabit = false
+                    isAddingHabit = false,
+                    isEditingHabit = false
                 ) }
             }
             HabitEvent.SaveHabit -> {
@@ -90,6 +91,28 @@ class HabitViewModel(
             HabitEvent.ShowDialog -> {
                 _state.update { it.copy(
                     isAddingHabit = true
+                ) }
+            }
+
+            HabitEvent.EditHabit -> {
+                val habit = Habit(
+                    id = _state.value.id,
+                    title = _state.value.title,
+                    description = _state.value.description,
+                    isArchived = _state.value.isArchived,
+                    frequency = _state.value.frequency,
+                )
+                viewModelScope.launch {
+                    habitRepository.updateHabit(habit)
+                    loadHabits()
+                }
+                _state.update { it.copy(
+                    isAddingHabit = false,
+                    isEditingHabit = false,
+                    title = "",
+                    description = "",
+                    frequency = Frequency.DAILY,
+                    isArchived = false,
                 ) }
             }
         }

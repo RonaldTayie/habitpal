@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.habitpal.domain.models.Habit
+import com.example.habitpal.domain.enums.Frequency
 import com.example.habitpal.domain.repositories.HabitLogRepository
 import com.example.habitpal.domain.repositories.HabitRepository
 import com.example.habitpal.domain.utils.HabitReminderReceiver
@@ -75,11 +75,25 @@ class HabitLogViewModel(
             _logSuccess.value = success
 
             if (success) {
-                val tomorrow9AM = LocalDateTime.now()
-                    .plusDays(1)
-                    .withHour(9).withMinute(0).withSecond(0).withNano(0)
+                val now = LocalDateTime.now()
+                var nextNotificationDate: LocalDateTime = now;
 
-                val delay = ChronoUnit.MILLIS.between(LocalDateTime.now(), tomorrow9AM).coerceAtLeast(0)
+                when(habit.frequency){
+                    Frequency.HOURLY -> {
+                        nextNotificationDate = now.withHour(1)
+                    }
+                    Frequency.DAILY -> {
+                        nextNotificationDate = now.plusDays(1)
+                    }
+                    Frequency.WEEKLY -> {
+                        nextNotificationDate = now.plusWeeks(1)
+                    }
+                    Frequency.MONTHLY -> {
+                        nextNotificationDate = now.plusDays(1)
+                    }
+                }
+
+                val delay = ChronoUnit.MILLIS.between(LocalDateTime.now(), nextNotificationDate).coerceAtLeast(0)
 
                 scheduleReminder(
                     context = context,

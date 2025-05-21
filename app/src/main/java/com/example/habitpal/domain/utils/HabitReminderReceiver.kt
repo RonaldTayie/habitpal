@@ -1,6 +1,5 @@
 package com.example.habitpal.domain.utils
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -10,7 +9,6 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 
 class HabitReminderReceiver : BroadcastReceiver() {
-    @SuppressLint("ServiceCast")
     override fun onReceive(context: Context, intent: Intent) {
         val habitTitle = intent.getStringExtra("habit_title") ?: "Your Habit Reminder"
 

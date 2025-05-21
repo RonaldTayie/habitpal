@@ -25,7 +25,13 @@ fun AddHabitDialog(viewModel: HabitViewModel) {
             viewModel.onEvent(HabitEvent.HideDialog)
         },
         confirmButton = {
-            TextButton(onClick = { viewModel.onEvent(HabitEvent.SaveHabit) }) {
+            TextButton(onClick = {
+                if(viewModel.state.value.isEditingHabit){
+                    viewModel.onEvent(HabitEvent.EditHabit)
+                }else{
+                    viewModel.onEvent(HabitEvent.SaveHabit)
+                }
+            }) {
                 Text("Save")
             }
         },
@@ -34,7 +40,13 @@ fun AddHabitDialog(viewModel: HabitViewModel) {
                 Text("Cancel")
             }
         },
-        title = { Text("New Habit") },
+        title = {
+            if(state.isEditingHabit){
+                Text("Edit Habit")
+            }else{
+                Text("New Habit")
+            }
+        },
         text = {
             Column {
                 OutlinedTextField(

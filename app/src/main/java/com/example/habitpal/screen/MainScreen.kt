@@ -80,6 +80,10 @@ fun MainScreen(
             if (state.value.isAddingHabit) {
                 AddHabitDialog(viewModel = habitVM)
             }
+
+            if (state.value.isEditingHabit) {
+                AddHabitDialog(viewModel = habitVM)
+            }
         }
     )
 }

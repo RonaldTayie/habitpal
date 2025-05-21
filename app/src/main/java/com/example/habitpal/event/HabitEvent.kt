@@ -5,6 +5,7 @@ import com.example.habitpal.domain.models.Habit
 
 sealed interface HabitEvent {
     data object SaveHabit : HabitEvent
+    data object EditHabit: HabitEvent
     data class DeleteHabit( val habit: Habit): HabitEvent
     data class SetTitle(val title:String): HabitEvent
     data class SetDescription(val description:String):HabitEvent

@@ -1,7 +1,5 @@
 package com.example.habitpal.screen
 
-import android.provider.CalendarContract.Colors
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -29,10 +25,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.habitpal.domain.models.Habit
 import com.example.habitpal.viewmodel.HabitViewModel
+import kotlinx.coroutines.flow.update
 
 @Composable
 fun HabitListScreen(
@@ -82,10 +78,29 @@ fun HabitListScreen(
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
-                        AssistChip(
-                            onClick = {},
-                            label = { Text(habit.frequency.toString()) }
-                        )
+                        Box(){
+                            Row(){
+                                AssistChip(
+                                    onClick = {},
+                                    label = { Text(habit.frequency.toString()) }
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                AssistChip(
+                                    onClick = {
+                                        habitViewModel.state.update { it.copy(
+                                            id = habit.id,
+                                            title = habit.title,
+                                            isArchived = habit.isArchived,
+                                            description = habit.description,
+                                            isEditingHabit = true
+                                        ) }
+                                    },
+                                    label = {
+                                        Text("EDIT")
+                                    }
+                                )
+                            }
+                        }
 
                     }
                 }}
