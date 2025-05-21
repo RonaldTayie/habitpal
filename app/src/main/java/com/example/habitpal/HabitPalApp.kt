@@ -2,6 +2,7 @@ package com.example.habitpal
 
 import android.app.Application
 import com.example.habitpal.domain.database.DatabaseProvider
+import com.example.habitpal.domain.repositories.HabitGroupRepository
 import com.example.habitpal.domain.repositories.HabitLogRepository
 import com.example.habitpal.domain.repositories.HabitRepository
 
@@ -13,6 +14,8 @@ class HabitPalApp : Application() {
     lateinit var habitLogRepository: HabitLogRepository
         private set
 
+    lateinit var habitGroupRepository: HabitGroupRepository
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -21,5 +24,6 @@ class HabitPalApp : Application() {
 
         habitRepository = HabitRepository(db.habitDao())
         habitLogRepository = HabitLogRepository(db.habitLogDao())
+        habitGroupRepository = HabitGroupRepository(db.groupDao())
     }
 }

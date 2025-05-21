@@ -18,15 +18,26 @@ class HabitViewModel(
     private val _state = MutableStateFlow(HabitState())
     val state = _state
 
-    suspend fun loadHabits(){
-        val h = habitRepository.getAllHabits()
-        _state.update { it.copy(
-            habits=h
-        ) }
+    fun loadHabits(){
+        viewModelScope.launch {
+            val h = habitRepository.getAllHabits()
+            _state.update { it.copy(
+                habits=h
+            ) }
+        }
     }
 
     fun getHabits():List<Habit> {
         return _state.value.habits
+    }
+
+    fun getGroupHabits(id:Long) {
+        viewModelScope.launch {
+            val habits = habitRepository.getGroupHabits(id)
+            _state.update { it.copy(
+                habits = habits
+            )}
+        }
     }
 
     fun onEvent(event:HabitEvent){
@@ -52,6 +63,7 @@ class HabitViewModel(
             HabitEvent.SaveHabit -> {
                 val habit = Habit(
                     title = _state.value.title,
+                    groupId = _state.value.group,
                     description = _state.value.description,
                     isArchived = _state.value.isArchived,
                     frequency = _state.value.frequency,
@@ -64,6 +76,7 @@ class HabitViewModel(
                     isAddingHabit = false,
                     title = "",
                     description = "",
+                    group = 0,
                     frequency = Frequency.DAILY,
                     isArchived = false,
                 ) }
@@ -104,6 +117,7 @@ class HabitViewModel(
                 val habit = Habit(
                     id = _state.value.id,
                     title = _state.value.title,
+                    groupId = _state.value.group,
                     description = _state.value.description,
                     isArchived = _state.value.isArchived,
                     frequency = _state.value.frequency,
@@ -117,8 +131,15 @@ class HabitViewModel(
                     isEditingHabit = false,
                     title = "",
                     description = "",
+                    group = 0,
                     frequency = Frequency.DAILY,
                     isArchived = false,
+                ) }
+            }
+
+            is HabitEvent.SetGroup -> {
+                _state.update { it.copy(
+                    group = event.group
                 ) }
             }
         }

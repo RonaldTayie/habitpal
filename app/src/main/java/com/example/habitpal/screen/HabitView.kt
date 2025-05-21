@@ -29,20 +29,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.example.habitpal.composable.HabitCard
 import com.example.habitpal.domain.models.Habit
+import com.example.habitpal.viewmodel.HabitGroupViewModel
 import com.example.habitpal.viewmodel.HabitViewModel
-import kotlinx.coroutines.flow.update
 
 @Composable
 fun HabitListScreen(
     habitViewModel: HabitViewModel,
+    habitGroupVM: HabitGroupViewModel,
     padding: PaddingValues,
     onHabitSelected: (Habit) -> Unit = {}
 ) {
     val state by habitViewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
+        habitGroupVM.loadGroups()
         habitViewModel.loadHabits()
     }
 
@@ -63,62 +65,12 @@ fun HabitListScreen(
         ) {
             items(
                 items=state.habits,
-                itemContent = {habit->Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onHabitSelected(habit) },
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), Arrangement.Absolute.SpaceBetween ) {
-                        Column {
-                            Text(
-                                text = habit.title,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = habit.description,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                        Box(){
-                            Row(){
-                                AssistChip(
-                                    onClick = {},
-                                    label = { Text(habit.frequency.toString()) }
-                                )
-                                IconButton(onClick = {
-                                    habitViewModel.state.update { it.copy(
-                                        id = habit.id,
-                                        title = habit.title,
-                                        isArchived = habit.isArchived,
-                                        description = habit.description,
-                                        isEditingHabit = true
-                                    ) }
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Edit,
-                                        contentDescription = "Edit"
-                                    )
-                                }
-                                IconButton(onClick = {
-                                    habitViewModel.state.update { it.copy(
-                                        targetHabit = habit,
-                                        id = habit.id,
-                                        isDeletingHabit = true
-                                    ) }
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.DeleteOutline,
-                                        contentDescription = "Delete"
-                                    )
-                                }
-                            }
-                        }
-
-                    }
-                }}
+                itemContent = {habit-> HabitCard(
+                        habitViewModel = habitViewModel,
+                        habit = habit,
+                        onHabitSelected = onHabitSelected
+                    )
+                }
             )
         }
     }

@@ -12,6 +12,7 @@ data class Habit(
     val title: String,
     val description: String,
     val frequency: Frequency,
-    val isArchived: Boolean = false
+    val isArchived: Boolean = false,
+    val groupId: Long? = null
 
 )
