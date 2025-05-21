@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import com.example.habitpal.ui.theme.HabitPalTheme
 import com.example.habitpal.viewmodel.HabitLogViewModel
@@ -27,7 +26,6 @@ class MainActivity : ComponentActivity() {
         habitLogViewModel = HabitLogViewModel(app.habitLogRepository,habitRepository = app.habitRepository)
         habitStreakViewModel = HabitStreakViewModel(app.habitLogRepository)
 
-        enableEdgeToEdge()
         setContent {
             HabitPalTheme {
                 MainScreen(habitVM=habitViewModel,habitLogVM=habitLogViewModel, streakVM = habitStreakViewModel)

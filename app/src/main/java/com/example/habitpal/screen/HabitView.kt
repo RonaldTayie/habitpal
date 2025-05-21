@@ -11,12 +11,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +37,7 @@ import kotlinx.coroutines.flow.update
 @Composable
 fun HabitListScreen(
     habitViewModel: HabitViewModel,
-    padding: PaddingValues?,
+    padding: PaddingValues,
     onHabitSelected: (Habit) -> Unit = {}
 ) {
     val state by habitViewModel.state.collectAsState()
@@ -46,7 +50,7 @@ fun HabitListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(padding),
             contentAlignment = Alignment.Center
         ) {
             Text("No habits found.", style = MaterialTheme.typography.bodyLarge)
@@ -55,7 +59,7 @@ fun HabitListScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding ?: PaddingValues(0.dp))
+                .padding(padding)
         ) {
             items(
                 items=state.habits,
@@ -84,21 +88,32 @@ fun HabitListScreen(
                                     onClick = {},
                                     label = { Text(habit.frequency.toString()) }
                                 )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                AssistChip(
-                                    onClick = {
-                                        habitViewModel.state.update { it.copy(
-                                            id = habit.id,
-                                            title = habit.title,
-                                            isArchived = habit.isArchived,
-                                            description = habit.description,
-                                            isEditingHabit = true
-                                        ) }
-                                    },
-                                    label = {
-                                        Text("EDIT")
-                                    }
-                                )
+                                IconButton(onClick = {
+                                    habitViewModel.state.update { it.copy(
+                                        id = habit.id,
+                                        title = habit.title,
+                                        isArchived = habit.isArchived,
+                                        description = habit.description,
+                                        isEditingHabit = true
+                                    ) }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Edit"
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    habitViewModel.state.update { it.copy(
+                                        targetHabit = habit,
+                                        id = habit.id,
+                                        isDeletingHabit = true
+                                    ) }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.DeleteOutline,
+                                        contentDescription = "Delete"
+                                    )
+                                }
                             }
                         }
 

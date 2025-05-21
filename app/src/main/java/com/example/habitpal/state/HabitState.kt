@@ -11,5 +11,7 @@ data class HabitState (
     val isArchived: Boolean = false,
     val isAddingHabit: Boolean = false,
     val isEditingHabit: Boolean = false,
-    val viewFrequency: Frequency = Frequency.DAILY
+    val isDeletingHabit: Boolean = false,
+    val viewFrequency: Frequency = Frequency.DAILY,
+    val targetHabit: Habit? = null
 )

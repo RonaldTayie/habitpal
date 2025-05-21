@@ -16,7 +16,6 @@ class HabitViewModel(
 ):ViewModel() {
 
     private val _state = MutableStateFlow(HabitState())
-
     val state = _state
 
     suspend fun loadHabits(){
@@ -34,13 +33,20 @@ class HabitViewModel(
         when(event){
             is HabitEvent.DeleteHabit -> {
                 viewModelScope.launch {
-                    habitRepository.deleteHabit(event.habit)
+                    habitRepository.deleteHabit(state.value.targetHabit!!)
+                    loadHabits()
                 }
+                _state.update { it.copy(
+                    targetHabit = null,
+                    isDeletingHabit = false
+                ) }
             }
             HabitEvent.HideDialog -> {
                 _state.update { it.copy(
                     isAddingHabit = false,
-                    isEditingHabit = false
+                    isEditingHabit = false,
+                    targetHabit = null,
+                    isDeletingHabit = false
                 ) }
             }
             HabitEvent.SaveHabit -> {
