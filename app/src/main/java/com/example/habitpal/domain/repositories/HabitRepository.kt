@@ -27,4 +27,8 @@ class HabitRepository(
         habitDao.delete(habit)
     }
 
+    suspend fun getGroupHabits(group_id:Long):List<Habit> {
+        return habitDao.getAllGroups(group_id)
+    }
+
 }

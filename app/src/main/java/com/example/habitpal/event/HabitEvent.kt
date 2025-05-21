@@ -8,6 +8,7 @@ sealed interface HabitEvent {
     data class SetTitle(val title:String): HabitEvent
     data class SetDescription(val description:String):HabitEvent
     data class SetFrequency(val frequency: Frequency): HabitEvent
+    data class SetGroup(val group:Long): HabitEvent
     data class SetArchived(val isArchived: Boolean): HabitEvent
     data object ShowDialog: HabitEvent
     data object HideDialog: HabitEvent

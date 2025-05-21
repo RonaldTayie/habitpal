@@ -12,12 +12,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.habitpal.composable.FrequencyDropdown
+import com.example.habitpal.composable.HabitGroupDropdown
 import com.example.habitpal.event.HabitEvent
+import com.example.habitpal.viewmodel.HabitGroupViewModel
 import com.example.habitpal.viewmodel.HabitViewModel
 
 @Composable
-fun AddHabitDialog(viewModel: HabitViewModel) {
+fun AddHabitDialog(
+    viewModel: HabitViewModel,
+    groupVM: HabitGroupViewModel
+) {
     val state by viewModel.state.collectAsState()
+    val groupState by groupVM.state.collectAsState()
 
     AlertDialog(
         onDismissRequest = {
@@ -60,6 +66,12 @@ fun AddHabitDialog(viewModel: HabitViewModel) {
                     onValueChange = { viewModel.onEvent(HabitEvent.SetDescription(it)) },
                     label = { Text("Description") },
                     modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                HabitGroupDropdown(
+                    onSelected = {viewModel.onEvent(HabitEvent.SetGroup(it!!.id))},
+                    selected = groupVM.getGroup(state.group),
+                    groupVM = groupVM
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FrequencyDropdown(

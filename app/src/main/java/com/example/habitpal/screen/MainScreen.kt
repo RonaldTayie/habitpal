@@ -1,14 +1,17 @@
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountTree
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddToPhotos
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -19,6 +22,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -27,33 +33,38 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.habitpal.composable.ConfirmDeleteDialog
+import com.example.habitpal.composable.HabitGroupDialog
 import com.example.habitpal.event.HabitEvent
+import com.example.habitpal.event.HabitGroupEvent
 import com.example.habitpal.screen.HabitListScreen
 import com.example.habitpal.screen.StreakView
+import com.example.habitpal.viewmodel.HabitGroupViewModel
 import com.example.habitpal.viewmodel.HabitLogViewModel
 import com.example.habitpal.viewmodel.HabitStreakViewModel
 import com.example.habitpal.viewmodel.HabitViewModel
 import kotlinx.coroutines.flow.update
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     habitVM: HabitViewModel,
     streakVM: HabitStreakViewModel,
-    habitLogVM: HabitLogViewModel
+    habitLogVM: HabitLogViewModel,
+    habitGroupVM: HabitGroupViewModel
 ) {
 
     val state = habitVM.state.collectAsState()
+    val habitGroupState = habitGroupVM.state.collectAsState()
     val success by habitLogVM.logSuccess.collectAsState()
+
+    var expandedGroupMenu by remember { mutableStateOf(false) }
 
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     Scaffold(
-
-        modifier = Modifier.padding(WindowInsets.systemBars.asPaddingValues()),
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -70,7 +81,56 @@ fun MainScreen(
                     Text("HabitPal")
                 },
                 actions = {
-                    if (currentRoute == "streak_view/{habitId}") {
+                    if (currentRoute == "habit_list") {
+                        Box {
+                            IconButton(onClick = { expandedGroupMenu = !expandedGroupMenu }) {
+                                Icon(Icons.Filled.AccountTree, contentDescription = "Filter")
+                            }
+                            DropdownMenu(
+                                expanded = expandedGroupMenu,
+                                onDismissRequest = { expandedGroupMenu = false },
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("All") },
+                                    onClick = { habitVM.loadHabits() }
+                                )
+                                habitGroupState.value.groups.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                option.name,
+                                                modifier = Modifier.combinedClickable(
+                                                    onClick = {
+                                                        expandedGroupMenu=false
+                                                        habitVM.getGroupHabits(option.id)
+                                                    },
+                                                    onLongClick = {
+                                                        habitGroupVM.state.update { it.copy(
+                                                            isGroupDialogOpen = true,
+                                                            targetGroup=option,
+                                                            id = option.id,
+                                                            name = option.name
+                                                        )}
+                                                        habitGroupVM.onEvent(event=HabitGroupEvent.OpenGroupDialog)
+                                                    }
+                                                ).fillMaxSize(),)
+                                        },
+                                        onClick = {
+                                            expandedGroupMenu=false
+                                            habitVM.getGroupHabits(option.id)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        IconButton(onClick = {
+                            habitGroupVM.onEvent(event=HabitGroupEvent.OpenGroupDialog)
+                        }) {
+                            Icon(Icons.Filled.AddToPhotos, contentDescription = "Create Group")
+                        }
+
+                    }else {
                         Button(
                             onClick = { habitLogVM.logToday(navController.context,
                                 state.value.targetHabit?.id ?: 0
@@ -109,13 +169,12 @@ fun MainScreen(
                 composable ("habit_list"){
                     HabitListScreen(
                         habitViewModel = habitVM,
+                        habitGroupVM = habitGroupVM,
                         padding=innerPadding,
                         onHabitSelected = { habit ->
-
                             habitVM.state.update { it.copy(
                                 targetHabit = habit
                             )}
-
                             navController.navigate("streak_view/${habit.id}")
                         }
                     )
@@ -130,14 +189,18 @@ fun MainScreen(
             }
 
             if (state.value.isAddingHabit) {
-                AddHabitDialog(viewModel = habitVM)
+                AddHabitDialog(viewModel = habitVM, groupVM = habitGroupVM)
             }
 
             if (state.value.isEditingHabit) {
-                AddHabitDialog(viewModel = habitVM)
+                AddHabitDialog(viewModel = habitVM,groupVM=habitGroupVM)
             }
             if(state.value.isDeletingHabit && state.value.targetHabit != null){
                 ConfirmDeleteDialog(viewModel = habitVM)
+            }
+
+            if(habitGroupState.value.isGroupDialogOpen){
+                HabitGroupDialog(habitGroupVM = habitGroupVM)
             }
         }
     )

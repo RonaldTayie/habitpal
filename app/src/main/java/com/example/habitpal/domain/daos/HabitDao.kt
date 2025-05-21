@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.habitpal.domain.models.Habit
+import com.example.habitpal.domain.models.HabitGroup
 
 @Dao
 interface HabitDao {
@@ -25,5 +26,11 @@ interface HabitDao {
 
     @Delete
     suspend fun delete(habit: Habit)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertGroup(group: HabitGroup): Long
+
+    @Query("SELECT * FROM habit WHERE groupId=:id")
+    suspend fun getAllGroups(id:Long): List<Habit>
 
 }

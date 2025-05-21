@@ -8,6 +8,7 @@ data class HabitState (
     val title: String = "",
     val description: String ="",
     val frequency: Frequency = Frequency.DAILY,
+    val group: Long? = 0,
     val isArchived: Boolean = false,
     val isAddingHabit: Boolean = false,
     val isEditingHabit: Boolean = false,
