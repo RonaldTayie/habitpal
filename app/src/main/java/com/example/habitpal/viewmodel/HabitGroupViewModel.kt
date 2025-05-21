@@ -45,6 +45,11 @@ class HabitGroupViewModel(
                     groupRepository.insertGroup(group)
                     loadGroups()
                 }
+                state.update { it.copy(
+                    name = "",
+                    id=1,
+                    targetGroup = null
+                )}
             }
             is HabitGroupEvent.UpdateHabitGroup->{
                 val group = HabitGroup(id = _state.value.id, name = _state.value.name)
@@ -52,6 +57,11 @@ class HabitGroupViewModel(
                     groupRepository.updateGroup(group)
                     loadGroups()
                 }
+                state.update { it.copy(
+                    name = "",
+                    id=1,
+                    targetGroup = null
+                )}
             }
             is HabitGroupEvent.CloseGroupDialog->{
                 _state.update { it.copy(
