@@ -129,6 +129,7 @@ fun MainScreen(
                         }) {
                             Icon(Icons.Filled.AddToPhotos, contentDescription = "Create Group")
                         }
+
                     }else {
                         Button(
                             onClick = { habitLogVM.logToday(navController.context,
