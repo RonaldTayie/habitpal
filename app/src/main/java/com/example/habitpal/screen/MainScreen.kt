@@ -5,10 +5,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountTree
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddToPhotos
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -73,7 +72,7 @@ fun MainScreen(
                             habitLogVM.clearState()
                             navController.popBackStack()
                         }) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Add")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Add")
                         }
                     }
                 },
@@ -84,7 +83,7 @@ fun MainScreen(
                     if (currentRoute == "habit_list") {
                         Box {
                             IconButton(onClick = { expandedGroupMenu = !expandedGroupMenu }) {
-                                Icon(Icons.Filled.AccountTree, contentDescription = "Filter")
+                                Icon(Icons.AutoMirrored.Default.List, contentDescription = "Filter")
                             }
                             DropdownMenu(
                                 expanded = expandedGroupMenu,
@@ -127,7 +126,7 @@ fun MainScreen(
                         IconButton(onClick = {
                             habitGroupVM.onEvent(event=HabitGroupEvent.OpenGroupDialog)
                         }) {
-                            Icon(Icons.Filled.AddToPhotos, contentDescription = "Create Group")
+                            Icon(Icons.Filled.Add, contentDescription = "Create Group")
                         }
 
                     }else {
